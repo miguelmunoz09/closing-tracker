@@ -1,0 +1,75 @@
+// Esquema de la base de datos (Prisma).
+// Después de conectar la base en Vercel y completar el archivo ".env",
+// corré: npx prisma migrate dev --name init
+// Eso crea las tablas reales en la base a partir de este archivo.
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+  // Conexión "pooled": la usa la app en funcionamiento.
+  url       = env("DATABASE_URL")
+  // Conexión directa: la usa Prisma solo para migraciones.
+  directUrl = env("DATABASE_URL_UNPOOLED")
+}
+
+enum TaskClosingType {
+  MONTHLY
+  QUARTERLY
+}
+
+// Una sección desplegable (Revenue, BS & P&L, Income tax, Reporting...).
+model Section {
+  id        String @id @default(cuid())
+  name      String @unique
+  sortOrder Int    @default(0)
+  tasks     Task[]
+}
+
+// Una tarea del cierre. Es global: aplica a todas las entidades.
+model Task {
+  id          String           @id @default(cuid())
+  name        String
+  closingType TaskClosingType
+  sortOrder   Int              @default(0)
+  createdAt   DateTime         @default(now())
+  sectionId   String
+  section     Section          @relation(fields: [sectionId], references: [id])
+  completions TaskCompletion[]
+
+  // Evita crear dos tareas con el mismo nombre dentro de la misma sección.
+  @@unique([sectionId, name])
+}
+
+// Una entidad reportante (código + país). Ej: "2560" + "Uruguay".
+model Entity {
+  id          String           @id @default(cuid())
+  code        String           @unique
+  country     String
+  // Texto ya armado para mostrar en listas, ej: "Uruguay (2560)".
+  displayName String
+  completions TaskCompletion[]
+}
+
+// Historial de marcado/desmarcado de tareas. NUNCA se borra ni se pisa una fila:
+// cada vez que alguien tilda o destilda una tarea se agrega una fila nueva.
+// El estado "actual" de una tarea es simplemente la fila más reciente para
+// esa combinación de entidad + tarea + mes. Así el historial completo queda
+// guardado automáticamente, sin necesidad de una tabla aparte.
+model TaskCompletion {
+  id        String   @id @default(cuid())
+  entityId  String
+  taskId    String
+  period    String // formato "YYYY-MM", ej: "2026-08"
+  completed Boolean // estado DESPUÉS de esta acción
+  createdAt DateTime @default(now())
+
+  entity Entity @relation(fields: [entityId], references: [id])
+  task   Task   @relation(fields: [taskId], references: [id])
+
+  @@index([entityId, period])
+  @@index([taskId, period])
+  @@index([period])
+}
