@@ -50,6 +50,11 @@ export const SECTIONS: {
       { name: "Tax template", closingType: "QUARTERLY" },
     ],
   },
+  {
+    name: "Sign Off",
+    sortOrder: 4,
+    tasks: [{ name: "Confirm month close", closingType: "MONTHLY" }],
+  },
 ];
 
 // Datos tomados del archivo "Entidades y paises.xlsx".

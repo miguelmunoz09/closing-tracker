@@ -1,10 +1,10 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { getEntityById, getEntityClosingData, getSections } from "@/lib/data";
+import { getEntityById, getEntityClosingData } from "@/lib/data";
 import { getAvailablePeriods, getDefaultPeriod } from "@/lib/period";
+import { getCountryFlag } from "@/lib/countryFlags";
 import { PeriodSelector } from "@/components/PeriodSelector";
 import { SectionAccordion } from "@/components/SectionAccordion";
-import { AddTaskForm } from "@/components/AddTaskForm";
 
 export default async function EntityPage({
   params,
@@ -17,10 +17,7 @@ export default async function EntityPage({
   if (!entity) notFound();
 
   const period = searchParams.period ?? getDefaultPeriod();
-  const [data, sections] = await Promise.all([
-    getEntityClosingData(entity.id, period),
-    getSections(),
-  ]);
+  const data = await getEntityClosingData(entity.id, period);
 
   const totalTasks = data.sections.reduce((sum, s) => sum + s.tasks.length, 0);
   const completedTasks = data.sections.reduce(
@@ -36,7 +33,9 @@ export default async function EntityPage({
 
       <div className="mt-2 flex flex-wrap items-center justify-between gap-3">
         <div>
-          <h1 className="text-xl font-bold">{entity.displayName}</h1>
+          <h1 className="text-xl font-bold">
+            {getCountryFlag(entity.country)} {entity.displayName}
+          </h1>
           <p className="text-sm text-gray-500">
             {completedTasks}/{totalTasks} tareas completadas ·{" "}
             {data.periodClosingType === "QUARTERLY" ? "Cierre Quarterly" : "Cierre Monthly"}
@@ -54,8 +53,6 @@ export default async function EntityPage({
           <SectionAccordion key={section.id} entityId={entity.id} period={period} section={section} />
         ))}
       </div>
-
-      <AddTaskForm entityId={entity.id} sections={sections} />
     </main>
   );
 }

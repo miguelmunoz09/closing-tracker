@@ -110,6 +110,7 @@ export async function getEntityClosingData(
 export type CorporateEntityRow = {
   entityId: string;
   displayName: string;
+  country: string;
   completed: number;
   total: number;
   percent: number;
@@ -167,6 +168,7 @@ export async function getCorporateSummary(period: string): Promise<CorporateSumm
     return {
       entityId: e.id,
       displayName: e.displayName,
+      country: e.country,
       completed,
       total: totalPerEntity,
       percent: totalPerEntity ? Math.round((completed / totalPerEntity) * 100) : 0,

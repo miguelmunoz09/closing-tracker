@@ -3,6 +3,7 @@
 import { useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import type { EntitySummary } from "@/lib/data";
+import { getCountryFlag } from "@/lib/countryFlags";
 
 /**
  * Buscador simple de entidades: escribís y filtra por país o código,
@@ -48,6 +49,7 @@ export function EntityPicker({ entities, period }: { entities: EntitySummary[]; 
               onClick={() => goTo(e.id)}
               className="w-full px-3 py-2 text-left text-sm hover:bg-gray-100 focus:bg-gray-100 focus:outline-none"
             >
+              <span className="mr-2">{getCountryFlag(e.country)}</span>
               {e.displayName}
             </button>
           </li>

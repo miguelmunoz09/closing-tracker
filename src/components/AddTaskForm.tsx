@@ -5,11 +5,11 @@ import { addTask } from "@/actions/tasks";
 import type { SectionOption } from "@/lib/data";
 
 /**
- * Formulario para agregar una tarea nueva. La tarea queda global: a partir
- * de ese momento aparece para todas las entidades (en los meses que le
- * correspondan según Monthly/Quarterly).
+ * Formulario para agregar una tarea nueva. Solo lo usa Corporate team: la
+ * tarea queda global y a partir de ese momento aparece para todas las
+ * entidades (en los meses que le correspondan según Monthly/Quarterly).
  */
-export function AddTaskForm({ entityId, sections }: { entityId: string; sections: SectionOption[] }) {
+export function AddTaskForm({ sections }: { sections: SectionOption[] }) {
   const [open, setOpen] = useState(false);
   const [sectionId, setSectionId] = useState(sections[0]?.id ?? "");
   const [name, setName] = useState("");
@@ -24,7 +24,7 @@ export function AddTaskForm({ entityId, sections }: { entityId: string; sections
     setError(null);
     setSuccess(false);
 
-    const res = await addTask({ entityId, sectionId, name, closingType });
+    const res = await addTask({ sectionId, name, closingType });
 
     setPending(false);
     if (res.ok) {

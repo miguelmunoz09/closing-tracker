@@ -1,9 +1,11 @@
 import Link from "next/link";
-import { getCorporateSummary } from "@/lib/data";
+import { getCorporateSummary, getSections } from "@/lib/data";
 import { getAvailablePeriods, getDefaultPeriod } from "@/lib/period";
 import { PeriodSelector } from "@/components/PeriodSelector";
-import { ProgressBar } from "@/components/ProgressBar";
-import { CorporateSummaryTable } from "@/components/CorporateSummaryTable";
+import { ProgressRing } from "@/components/ProgressRing";
+import { SectionProgressGrid } from "@/components/SectionProgressGrid";
+import { EntityProgressTable } from "@/components/EntityProgressTable";
+import { AddTaskForm } from "@/components/AddTaskForm";
 
 export default async function CorporatePage({
   searchParams,
@@ -11,7 +13,7 @@ export default async function CorporatePage({
   searchParams: { period?: string };
 }) {
   const period = searchParams.period ?? getDefaultPeriod();
-  const summary = await getCorporateSummary(period);
+  const [summary, sections] = await Promise.all([getCorporateSummary(period), getSections()]);
 
   return (
     <main className="mx-auto max-w-3xl px-4 py-8">
@@ -29,18 +31,26 @@ export default async function CorporatePage({
         <PeriodSelector value={period} options={getAvailablePeriods()} basePath="/corporate" />
       </div>
 
-      <div className="mt-6 rounded-lg border border-gray-200 bg-white p-5 shadow-sm">
-        <ProgressBar
+      <div className="mt-6 flex flex-col items-center rounded-lg border border-gray-200 bg-white p-6 shadow-sm">
+        <ProgressRing
           percent={summary.totals.percent}
-          label={`Avance total: ${summary.totals.completed}/${summary.totals.total} tareas`}
+          label="Avance total del mes"
+          sublabel={`${summary.totals.completed}/${summary.totals.total} tareas`}
+          size={160}
         />
       </div>
 
-      <CorporateSummaryTable
-        period={period}
-        byEntity={summary.byEntity}
-        bySection={summary.bySection}
-      />
+      <SectionProgressGrid bySection={summary.bySection} />
+
+      <EntityProgressTable period={period} byEntity={summary.byEntity} />
+
+      <div className="mt-6 rounded-lg border border-gray-200 bg-white p-5 shadow-sm">
+        <h2 className="mb-1 text-sm font-semibold text-gray-900">Agregar tarea nueva</h2>
+        <p className="mb-3 text-xs text-gray-500">
+          Se agrega a la sección elegida y queda disponible para todas las entidades.
+        </p>
+        <AddTaskForm sections={sections} />
+      </div>
     </main>
   );
 }
