@@ -206,6 +206,59 @@ export async function getCorporateSummary(period: string): Promise<CorporateSumm
   };
 }
 
+export type SectionEntityRow = {
+  entityId: string;
+  displayName: string;
+  country: string;
+  completed: number;
+  total: number;
+  closed: boolean;
+};
+
+/**
+ * Per-entity breakdown for a single section (e.g. "Revenue"): how many of
+ * that section's tasks each entity has completed for the given period, and
+ * whether it's fully closed. Used for the Corporate team detail view.
+ */
+export async function getSectionProgressByEntity(
+  period: string,
+  sectionName: string
+): Promise<SectionEntityRow[]> {
+  const types = visibleTypes(period);
+
+  const [entities, tasks, completions] = await Promise.all([
+    prisma.entity.findMany({ orderBy: { displayName: "asc" } }),
+    prisma.task.findMany({
+      where: { closingType: { in: types }, section: { name: sectionName } },
+    }),
+    prisma.taskCompletion.findMany({
+      where: { period, task: { closingType: { in: types }, section: { name: sectionName } } },
+      orderBy: { createdAt: "desc" },
+    }),
+  ]);
+
+  const latest = new Map<string, boolean>();
+  for (const c of completions) {
+    const key = `${c.entityId}:${c.taskId}`;
+    if (!latest.has(key)) latest.set(key, c.completed);
+  }
+
+  return entities.map((e) => {
+    let completed = 0;
+    for (const t of tasks) {
+      if (latest.get(`${e.id}:${t.id}`)) completed++;
+    }
+    return {
+      entityId: e.id,
+      displayName: e.displayName,
+      country: e.country,
+      completed,
+      total: tasks.length,
+      closed: tasks.length > 0 && completed === tasks.length,
+    };
+  });
+}
+
 export type TaskHistoryEvent = { completed: boolean; at: string };
 
 /** Historial completo (todas las marcas/desmarcas) de una tarea puntual. */

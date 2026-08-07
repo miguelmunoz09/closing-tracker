@@ -14,14 +14,14 @@ export async function GET(request: NextRequest) {
   const token = request.nextUrl.searchParams.get("token");
 
   if (!process.env.SEED_SECRET || token !== process.env.SEED_SECRET) {
-    return NextResponse.json({ ok: false, error: "No autorizado." }, { status: 401 });
+    return NextResponse.json({ ok: false, error: "Unauthorized." }, { status: 401 });
   }
 
   try {
     await seedDatabase(prisma);
-    return NextResponse.json({ ok: true, message: "Datos iniciales cargados." });
+    return NextResponse.json({ ok: true, message: "Initial data loaded." });
   } catch (err) {
     console.error("Seed route failed", err);
-    return NextResponse.json({ ok: false, error: "Error al cargar los datos." }, { status: 500 });
+    return NextResponse.json({ ok: false, error: "Failed to load the data." }, { status: 500 });
   }
 }

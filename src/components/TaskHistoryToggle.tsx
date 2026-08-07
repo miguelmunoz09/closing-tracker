@@ -4,7 +4,7 @@ import { useState } from "react";
 import { getTaskHistory } from "@/actions/tasks";
 
 function formatDateTime(iso: string): string {
-  return new Date(iso).toLocaleString("es-AR", {
+  return new Date(iso).toLocaleString("en-US", {
     day: "2-digit",
     month: "2-digit",
     year: "numeric",
@@ -47,18 +47,18 @@ export function TaskHistoryToggle({
         onClick={handleToggle}
         className="text-xs text-gray-500 underline hover:text-gray-800"
       >
-        {open ? "Ocultar historial" : "Ver historial"}
+        {open ? "Hide history" : "View history"}
       </button>
       {open && (
         <div className="mt-1 rounded-md bg-gray-50 px-2 py-1.5 text-xs text-gray-600">
-          {loading && <p>Cargando...</p>}
+          {loading && <p>Loading...</p>}
           {error && <p className="text-red-600">{error}</p>}
-          {events && events.length === 0 && <p>Todavía no hay movimientos para este mes.</p>}
+          {events && events.length === 0 && <p>No changes yet this period.</p>}
           {events && events.length > 0 && (
             <ul className="space-y-0.5">
               {events.map((e, i) => (
                 <li key={i}>
-                  {e.completed ? "Marcada como hecha" : "Desmarcada"} — {formatDateTime(e.at)}
+                  {e.completed ? "Marked done" : "Unmarked"} — {formatDateTime(e.at)}
                 </li>
               ))}
             </ul>

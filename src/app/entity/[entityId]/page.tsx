@@ -2,7 +2,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { getEntityById, getEntityClosingData } from "@/lib/data";
 import { getAvailablePeriods, getDefaultPeriod } from "@/lib/period";
-import { getCountryFlag } from "@/lib/countryFlags";
+import { Flag } from "@/components/Flag";
 import { PeriodSelector } from "@/components/PeriodSelector";
 import { SectionAccordion } from "@/components/SectionAccordion";
 
@@ -28,18 +28,19 @@ export default async function EntityPage({
   return (
     <main className="mx-auto max-w-2xl px-4 py-8">
       <Link href="/" className="text-sm text-gray-500 hover:underline">
-        ← Cambiar perfil
+        ← Change profile
       </Link>
 
       <div className="mt-2 flex flex-wrap items-center justify-between gap-3">
-        <div>
-          <h1 className="text-xl font-bold">
-            {getCountryFlag(entity.country)} {entity.displayName}
-          </h1>
-          <p className="text-sm text-gray-500">
-            {completedTasks}/{totalTasks} tareas completadas ·{" "}
-            {data.periodClosingType === "QUARTERLY" ? "Cierre Quarterly" : "Cierre Monthly"}
-          </p>
+        <div className="flex items-center gap-2">
+          <Flag country={entity.country} className="h-6 w-9 shrink-0" />
+          <div>
+            <h1 className="text-xl font-bold">{entity.displayName}</h1>
+            <p className="text-sm text-gray-500">
+              {completedTasks}/{totalTasks} tasks completed ·{" "}
+              {data.periodClosingType === "QUARTERLY" ? "Quarterly close" : "Monthly close"}
+            </p>
+          </div>
         </div>
         <PeriodSelector
           value={period}

@@ -1,125 +1,127 @@
-# Cierre contable mensual — panel de seguimiento
+# Monthly Accounting Close — Tracker
 
-App para hacer seguimiento del cierre contable mensual de las entidades que reportan. Cada persona entra, elige "Corporate team" o una entidad (país + código), elige el mes, y va tildando las tareas del cierre. El equipo corporativo ve el avance total de todas las entidades. Todo queda guardado en una base de datos compartida, con historial completo de cuándo se marcó y desmarcó cada tarea.
+An app to track the monthly accounting close for reporting entities. Each person signs in, picks "Corporate team" or an entity (country + code), picks the month, and checks off the closing tasks. The corporate team sees overall progress across all entities. Everything is stored in a shared database, with a full history of when each task was checked and unchecked.
 
-Este documento tiene los pasos exactos para dejar la app funcionando, pensados para alguien sin experiencia previa en programación. Copiá y pegá los comandos tal cual, en orden, en una terminal (en Windows: PowerShell) dentro de esta carpeta.
+This document has the exact steps to get the app running, written for someone with no prior programming experience. Copy and paste the commands as-is, in order, into a terminal (on Windows: PowerShell) inside this folder.
 
-## Qué es cada cosa (resumen rápido)
+## What each piece is (quick summary)
 
-- **Next.js**: el framework con el que está hecha la app (páginas + lógica).
-- **Tailwind**: cómo se ve la app (estilos).
-- **Prisma**: la herramienta que conecta la app con la base de datos.
-- **Vercel**: dónde queda "prendida" la app en internet (hosting).
-- **GitHub**: donde queda guardado el código; Vercel lo lee de ahí para publicar la app.
-- **Vercel Postgres (Neon)**: la base de datos donde se guardan las entidades, tareas y el historial de cierre.
+- **Next.js**: the framework the app is built with (pages + logic).
+- **Tailwind**: how the app looks (styling).
+- **Prisma**: the tool that connects the app to the database.
+- **Vercel**: where the app is hosted, live on the internet.
+- **GitHub**: where the code is stored; Vercel reads from there to publish the app.
+- **Vercel Postgres (Neon)**: the database where entities, tasks, and the closing history are stored.
 
-## 0. Requisitos
+## 0. Requirements
 
-- Tener instalado **Node.js** (incluye `npm`). Se puede verificar así:
+- Have **Node.js** installed (it includes `npm`). Check with:
 
 ```bash
 node --version
 npm --version
 ```
 
-Si da error, instalar desde https://nodejs.org (versión "LTS").
+If that errors out, install it from https://nodejs.org (the "LTS" version).
 
-- Tener una cuenta en https://github.com y otra en https://vercel.com (podés entrar a Vercel directamente con tu cuenta de GitHub).
+- Have an account at https://github.com and one at https://vercel.com (you can sign into Vercel directly with your GitHub account).
 
-## 1. Instalar las dependencias del proyecto
+## 1. Install the project's dependencies
 
-Parado en esta carpeta (`Reporting app`):
+From inside this folder (`Reporting app`):
 
 ```bash
 npm install
 ```
 
-Esto descarga todo lo que la app necesita para funcionar (Next.js, Tailwind, Prisma, etc.). Puede tardar uno o dos minutos.
+This downloads everything the app needs to run (Next.js, Tailwind, Prisma, etc.). It can take a minute or two.
 
-## 2. Subir el código a GitHub
+## 2. Push the code to GitHub
 
-1. Entrá a https://github.com/new y creá un repositorio nuevo (puede ser privado). No marques ninguna casilla de "agregar README" ni ".gitignore" — ya los tenemos.
-2. Copiá la URL del repo que te muestra GitHub (algo como `https://github.com/tu-usuario/closing-tracker.git`).
-3. En la terminal:
+1. Go to https://github.com/new and create a new repository (it can be private). Don't check any of the "Add a README file", "Add .gitignore", or "Choose a license" boxes — we already have those.
+2. Copy the repo URL GitHub shows you (something like `https://github.com/your-username/closing-tracker.git`).
+3. In the terminal:
 
 ```bash
 git init
 git add .
-git commit -m "Version inicial"
+git commit -m "Initial commit"
 git branch -M main
-git remote add origin PEGA_AQUI_LA_URL_DE_TU_REPO
+git remote add origin PASTE_YOUR_REPO_URL_HERE
 git push -u origin main
 ```
 
-## 3. Crear el proyecto en Vercel y conectar la base de datos
+## 3. Create the Vercel project and connect the database
 
-1. Entrá a https://vercel.com/new, elegí "Import Git Repository" y seleccioná el repo que acabás de subir.
-2. Antes de hacer clic en "Deploy", no hace falta tocar nada más — Vercel detecta que es un proyecto Next.js solo. Podés darle "Deploy" (va a fallar la primera vez porque todavía no existe la base de datos ni las variables de entorno — es esperado, seguimos).
-3. Dentro del proyecto ya creado en Vercel, ir a la pestaña **Storage** → **Create Database** → elegir **Postgres** (Neon) → seguí los pasos para crearla y conectarla a este proyecto. Vercel va a generar solo las variables de conexión.
-4. Ir a **Settings → Environment Variables** del proyecto y revisar qué variables quedaron creadas (van a tener nombres como `DATABASE_URL`, `POSTGRES_URL`, `POSTGRES_PRISMA_URL`, `POSTGRES_URL_NON_POOLING`, según la versión de la integración). Asegurate de que existan estas dos variables (si no existen con ese nombre exacto, creálas copiando el **valor** desde la que sí generó Vercel):
-   - `DATABASE_URL` → usá el valor de la conexión "pooled" (`POSTGRES_PRISMA_URL` o `DATABASE_URL` si ya existe).
-   - `DATABASE_URL_UNPOOLED` → usá el valor de la conexión directa (`POSTGRES_URL_NON_POOLING`).
+1. Go to https://vercel.com/new, choose "Import Git Repository", and select the repo you just pushed.
+2. Before clicking "Deploy", you don't need to touch anything else — Vercel detects it's a Next.js project on its own. Go ahead and click "Deploy" (it will fail the first time because the database and environment variables don't exist yet — that's expected, we'll fix it next).
+3. Inside the newly created Vercel project, go to the **Storage** tab → **Create Database** → choose **Postgres** (Neon) → follow the steps to create it and connect it to this project. Vercel will generate the connection variables on its own.
+4. Go to **Settings → Environment Variables** for the project and check which variables were created (they'll be named something like `DATABASE_URL`, `POSTGRES_URL`, `POSTGRES_PRISMA_URL`, `POSTGRES_URL_NON_POOLING`, depending on the integration version). Make sure these two variables exist (if they don't exist under these exact names, create them by copying the **value** from whichever one Vercel did generate):
+   - `DATABASE_URL` → use the "pooled" connection value (`POSTGRES_PRISMA_URL`, or `DATABASE_URL` if it already exists).
+   - `DATABASE_URL_UNPOOLED` → use the direct connection value (`POSTGRES_URL_NON_POOLING`).
 
-## 4. Configurar la base de datos en tu computadora (para poder crear las tablas)
+> **Heads up:** some Vercel database integrations mark these variables as "Sensitive," which means their real value can't be read from the CLI or the dashboard — including by `vercel env pull` in step 4 below. If that happens, `prisma migrate dev` and `prisma db seed` won't work from a computer, since they need the real value. The workaround: generate the initial migration **offline** (no DB connection needed) with `npx prisma migrate diff --from-empty --to-schema-datamodel=prisma/schema.prisma --script`, save that output as `prisma/migrations/<a timestamp>_init/migration.sql` plus a `prisma/migrations/migration_lock.toml` with `provider = "postgresql"`, commit and push it — Vercel's own build step (`prisma migrate deploy`, already wired into `npm run build`) will apply it using its own runtime access to the variables. For the initial data load, temporarily add a non-sensitive `SEED_SECRET` environment variable, redeploy so the build picks it up, then visit `https://your-app.vercel.app/api/seed?token=THAT_VALUE` once to run the seed — then remove the `SEED_SECRET` variable again.
 
-1. Instalá la herramienta de línea de comandos de Vercel y conectá esta carpeta con el proyecto que creaste:
+## 4. Set up the database on your computer (to create the tables)
+
+1. Install the Vercel command-line tool and link this folder to the project you created:
 
 ```bash
 npm install -g vercel
 vercel link
 ```
 
-(Te va a preguntar a qué proyecto de Vercel conectar esta carpeta — elegí el que creaste en el paso 3.)
+(It will ask which Vercel project to link this folder to — pick the one you created in step 3.)
 
-2. Traé las variables de entorno reales a esta carpeta:
+2. Pull the real environment variables into this folder:
 
 ```bash
 vercel env pull .env
 ```
 
-Esto crea un archivo `.env` (no se sube a GitHub, es solo para tu computadora) con las credenciales reales de la base.
+This creates a `.env` file (not pushed to GitHub, it's only for your computer) with the real database credentials.
 
-3. Creá las tablas en la base de datos a partir del esquema del proyecto:
+3. Create the database tables from the project's schema:
 
 ```bash
 npx prisma migrate dev --name init
 ```
 
-Esto genera una carpeta `prisma/migrations` — es importante subirla a GitHub (paso 6).
+This generates a `prisma/migrations` folder — it's important to push it to GitHub (step 6).
 
-4. Cargá los datos iniciales (las entidades y las tareas de los archivos Excel):
+4. Load the initial data (the entities and tasks from the Excel files):
 
 ```bash
 npx prisma db seed
 ```
 
-Si ves el mensaje `Listo: secciones, tareas y entidades cargadas.`, funcionó.
+If you see the message `Done: sections, tasks, and entities loaded.`, it worked.
 
-## 5. Probar la app en tu computadora (opcional)
+## 5. Try the app on your computer (optional)
 
 ```bash
 npm run dev
 ```
 
-Y abrí http://localhost:3000 en el navegador. `Ctrl + C` en la terminal para apagarla.
+Then open http://localhost:3000 in your browser. `Ctrl + C` in the terminal to stop it.
 
-## 6. Subir la migración y volver a publicar
+## 6. Push the migration and republish
 
 ```bash
 git add .
-git commit -m "Agregar migracion inicial de la base de datos"
+git commit -m "Add initial database migration"
 git push
 ```
 
-Al hacer `push`, Vercel vuelve a publicar la app automáticamente (ya con la base conectada), y esta vez sí debería funcionar. Podés seguir el progreso en la pestaña **Deployments** del proyecto en Vercel.
+Pushing automatically republishes the app on Vercel (now with the database connected), and this time it should actually work. You can follow along in the **Deployments** tab of the Vercel project.
 
-## Uso diario (una vez publicada)
+## Day-to-day use (once published)
 
-- Compartí la URL que te da Vercel (algo como `https://closing-tracker.vercel.app`) con el equipo contable.
-- No hace falta usuario ni contraseña: cada persona elige "Corporate team" o su entidad, elige el mes, y tilda las tareas.
-- Si un mes es marzo, junio, setiembre o diciembre, aparecen todas las tareas (Monthly + Quarterly). Los demás meses, solo las Monthly.
-- Cualquiera puede agregar una tarea nueva desde la pantalla de una entidad — queda disponible para todas las entidades a partir de ese momento.
+- Share the URL Vercel gives you (something like `https://closing-tracker.vercel.app`) with the accounting team.
+- No username or password needed: each person picks "Corporate team" or their entity, picks the month, and checks off tasks.
+- If a month is March, June, September, or December, every task shows up (Monthly + Quarterly). Every other month, only the Monthly ones.
+- Only the Corporate team view can add new tasks — once added, they become available to every entity from then on.
 
-## Si algo falla
+## If something breaks
 
-Copiá el mensaje de error completo de la terminal (o de la pestaña "Deployments" en Vercel, dentro del log del deploy que falló) y pegámelo — seguimos el paso a paso desde ahí.
+Copy the full error message from the terminal (or from the "Deployments" tab in Vercel, inside the log of the failed deploy) and send it over — we'll work through it step by step from there.

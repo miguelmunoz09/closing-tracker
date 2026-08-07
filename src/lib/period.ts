@@ -57,23 +57,23 @@ export function getDefaultPeriod(now: Date = new Date()): string {
   return available.includes(current) ? current : START_PERIOD;
 }
 
-const MONTH_LABELS_ES = [
-  "Enero",
-  "Febrero",
-  "Marzo",
-  "Abril",
-  "Mayo",
-  "Junio",
-  "Julio",
-  "Agosto",
-  "Setiembre",
-  "Octubre",
-  "Noviembre",
-  "Diciembre",
+const MONTH_LABELS = [
+  "January",
+  "February",
+  "March",
+  "April",
+  "May",
+  "June",
+  "July",
+  "August",
+  "September",
+  "October",
+  "November",
+  "December",
 ];
 
-/** "2026-08" -> "Agosto 2026" */
+/** "2026-08" -> "August 2026" */
 export function formatPeriodLabel(period: string): string {
   const [year, month] = period.split("-").map(Number);
-  return `${MONTH_LABELS_ES[month - 1]} ${year}`;
+  return `${MONTH_LABELS[month - 1]} ${year}`;
 }

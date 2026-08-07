@@ -4,7 +4,7 @@ import { useState, useTransition } from "react";
 import { toggleTaskCompletion } from "@/actions/tasks";
 
 function formatDate(iso: string): string {
-  return new Date(iso).toLocaleDateString("es-AR", { day: "2-digit", month: "2-digit", year: "numeric" });
+  return new Date(iso).toLocaleDateString("en-US", { day: "2-digit", month: "2-digit", year: "numeric" });
 }
 
 /**
@@ -55,7 +55,7 @@ export function TaskCheckbox({
       />
       {completed && completedAt && (
         <span className="whitespace-nowrap text-xs text-green-700">
-          ✓ Hecho el {formatDate(completedAt)}
+          ✓ Done on {formatDate(completedAt)}
         </span>
       )}
       {error && <span className="text-xs text-red-600">{error}</span>}

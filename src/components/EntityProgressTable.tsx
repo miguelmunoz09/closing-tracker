@@ -1,8 +1,8 @@
 import Link from "next/link";
 import type { CorporateEntityRow } from "@/lib/data";
-import { getCountryFlag } from "@/lib/countryFlags";
+import { Flag } from "@/components/Flag";
 
-/** Tabla por entidad, útil para ver rápido qué países van atrasados. */
+/** Per-entity table, useful for spotting at a glance which countries are behind. */
 export function EntityProgressTable({
   period,
   byEntity,
@@ -13,13 +13,13 @@ export function EntityProgressTable({
   return (
     <div className="mt-6 rounded-lg border border-gray-200 bg-white shadow-sm">
       <h2 className="border-b border-gray-100 px-4 py-3 text-sm font-semibold text-gray-900">
-        Avance por entidad
+        Progress by entity
       </h2>
       <table className="w-full text-sm">
         <thead>
           <tr className="text-left text-xs text-gray-500">
-            <th className="px-4 py-2">Entidad</th>
-            <th className="px-4 py-2 text-right">Avance</th>
+            <th className="px-4 py-2">Entity</th>
+            <th className="px-4 py-2 text-right">Progress</th>
           </tr>
         </thead>
         <tbody>
@@ -28,9 +28,10 @@ export function EntityProgressTable({
               <td className="px-4 py-2">
                 <Link
                   href={`/entity/${row.entityId}?period=${period}`}
-                  className="text-gray-900 hover:underline"
+                  className="flex items-center gap-2 text-gray-900 hover:underline"
                 >
-                  {getCountryFlag(row.country)} {row.displayName}
+                  <Flag country={row.country} />
+                  {row.displayName}
                 </Link>
               </td>
               <td className="px-4 py-2 text-right text-gray-600">

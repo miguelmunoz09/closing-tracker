@@ -41,7 +41,7 @@ export async function toggleTaskCompletion(input: ToggleInput): Promise<ToggleRe
     return { ok: true, completedAt: row.completed ? row.createdAt.toISOString() : null };
   } catch (err) {
     console.error("toggleTaskCompletion failed", err);
-    return { ok: false, error: "No se pudo guardar el cambio. Probá de nuevo." };
+    return { ok: false, error: "Couldn't save the change. Please try again." };
   }
 }
 
@@ -68,7 +68,7 @@ type AddTaskResult =
 export async function addTask(input: AddTaskInput): Promise<AddTaskResult> {
   const name = input.name.trim();
   if (!name) {
-    return { ok: false, error: "El nombre de la tarea no puede estar vacío." };
+    return { ok: false, error: "Task name can't be empty." };
   }
 
   try {
@@ -96,10 +96,10 @@ export async function addTask(input: AddTaskInput): Promise<AddTaskResult> {
     };
   } catch (err: unknown) {
     if (typeof err === "object" && err !== null && "code" in err && err.code === "P2002") {
-      return { ok: false, error: "Ya existe una tarea con ese nombre en esa sección." };
+      return { ok: false, error: "A task with that name already exists in that section." };
     }
     console.error("addTask failed", err);
-    return { ok: false, error: "No se pudo crear la tarea." };
+    return { ok: false, error: "Couldn't create the task." };
   }
 }
 
@@ -113,6 +113,6 @@ export async function getTaskHistory(input: HistoryInput): Promise<HistoryResult
     return { ok: true, events };
   } catch (err) {
     console.error("getTaskHistory failed", err);
-    return { ok: false, error: "No se pudo cargar el historial." };
+    return { ok: false, error: "Couldn't load the history." };
   }
 }

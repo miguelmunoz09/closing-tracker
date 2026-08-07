@@ -1,15 +1,19 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useMemo, useState, type ReactNode } from "react";
 import { useRouter } from "next/navigation";
 import type { EntitySummary } from "@/lib/data";
-import { getCountryFlag } from "@/lib/countryFlags";
+
+// The flag is rendered server-side (see app/page.tsx) and passed in as
+// already-rendered markup, so the flag icon library never ships to this
+// client component's JS bundle.
+export type PickerEntity = EntitySummary & { flag: ReactNode };
 
 /**
- * Buscador simple de entidades: escribís y filtra por país o código,
- * al elegir una entidad te lleva directo a su pantalla de cierre.
+ * Simple entity search box: type to filter by country or code, selecting an
+ * entity takes you straight to its closing screen.
  */
-export function EntityPicker({ entities, period }: { entities: EntitySummary[]; period: string }) {
+export function EntityPicker({ entities, period }: { entities: PickerEntity[]; period: string }) {
   const router = useRouter();
   const [query, setQuery] = useState("");
 
@@ -33,23 +37,23 @@ export function EntityPicker({ entities, period }: { entities: EntitySummary[]; 
       <input
         id="entity-search"
         type="text"
-        placeholder="Buscar país o código (ej: Uruguay, 2560)..."
+        placeholder="Search by country or code (e.g. Uruguay, 2560)..."
         value={query}
         onChange={(e) => setQuery(e.target.value)}
         className="mb-2 w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:border-gray-500 focus:outline-none"
       />
       <ul className="max-h-72 overflow-y-auto rounded-md border border-gray-200 bg-white">
         {filtered.length === 0 && (
-          <li className="px-3 py-2 text-sm text-gray-500">No se encontraron entidades.</li>
+          <li className="px-3 py-2 text-sm text-gray-500">No entities found.</li>
         )}
         {filtered.map((e) => (
           <li key={e.id}>
             <button
               type="button"
               onClick={() => goTo(e.id)}
-              className="w-full px-3 py-2 text-left text-sm hover:bg-gray-100 focus:bg-gray-100 focus:outline-none"
+              className="flex w-full items-center gap-2 px-3 py-2 text-left text-sm hover:bg-gray-100 focus:bg-gray-100 focus:outline-none"
             >
-              <span className="mr-2">{getCountryFlag(e.country)}</span>
+              {e.flag}
               {e.displayName}
             </button>
           </li>

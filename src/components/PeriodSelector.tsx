@@ -20,7 +20,7 @@ export function PeriodSelector({
 
   return (
     <label className="flex items-center gap-2 text-sm">
-      <span className="font-medium text-gray-700">Mes</span>
+      <span className="font-medium text-gray-700">Month</span>
       <select
         value={value}
         onChange={(e) => router.push(`${basePath}?period=${e.target.value}`)}

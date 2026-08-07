@@ -42,17 +42,17 @@ export function AddTaskForm({ sections }: { sections: SectionOption[] }) {
         onClick={() => setOpen(true)}
         className="mt-4 text-sm font-medium text-gray-700 underline hover:text-gray-900"
       >
-        + Agregar tarea nueva
+        + Add new task
       </button>
     );
   }
 
   return (
     <form onSubmit={handleSubmit} className="mt-4 space-y-3 rounded-md border border-gray-200 bg-white p-4">
-      <h3 className="text-sm font-semibold">Agregar tarea nueva</h3>
+      <h3 className="text-sm font-semibold">Add new task</h3>
 
       <label className="block text-sm">
-        Sección
+        Section
         <select
           value={sectionId}
           onChange={(e) => setSectionId(e.target.value)}
@@ -67,7 +67,7 @@ export function AddTaskForm({ sections }: { sections: SectionOption[] }) {
       </label>
 
       <label className="block text-sm">
-        Nombre de la tarea
+        Task name
         <input
           type="text"
           value={name}
@@ -78,7 +78,7 @@ export function AddTaskForm({ sections }: { sections: SectionOption[] }) {
       </label>
 
       <fieldset className="text-sm">
-        <legend className="mb-1">Frecuencia</legend>
+        <legend className="mb-1">Frequency</legend>
         <div className="flex gap-4">
           <label className="flex items-center gap-1.5">
             <input
@@ -102,7 +102,7 @@ export function AddTaskForm({ sections }: { sections: SectionOption[] }) {
       </fieldset>
 
       {error && <p className="text-sm text-red-600">{error}</p>}
-      {success && <p className="text-sm text-green-700">Tarea agregada.</p>}
+      {success && <p className="text-sm text-green-700">Task added.</p>}
 
       <div className="flex gap-2">
         <button
@@ -110,14 +110,14 @@ export function AddTaskForm({ sections }: { sections: SectionOption[] }) {
           disabled={pending}
           className="rounded-md bg-gray-900 px-3 py-1.5 text-sm font-medium text-white hover:bg-gray-700 disabled:opacity-50"
         >
-          {pending ? "Guardando..." : "Guardar"}
+          {pending ? "Saving..." : "Save"}
         </button>
         <button
           type="button"
           onClick={() => setOpen(false)}
           className="rounded-md px-3 py-1.5 text-sm font-medium text-gray-600 hover:bg-gray-100"
         >
-          Cancelar
+          Cancel
         </button>
       </div>
     </form>
