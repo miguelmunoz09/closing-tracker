@@ -14,10 +14,11 @@ export default async function CorporatePage({
   searchParams: { period?: string };
 }) {
   const period = searchParams.period ?? getDefaultPeriod();
-  const [summary, sections, revenueByEntity] = await Promise.all([
+  const [summary, sections, revenueByEntity, signOffByEntity] = await Promise.all([
     getCorporateSummary(period),
     getSections(),
     getSectionProgressByEntity(period, "Revenue"),
+    getSectionProgressByEntity(period, "Sign Off"),
   ]);
 
   return (
@@ -48,6 +49,8 @@ export default async function CorporatePage({
       <SectionProgressGrid bySection={summary.bySection} />
 
       <SectionEntityDetail title="Revenue — closing status by country" rows={revenueByEntity} />
+
+      <SectionEntityDetail title="Sign Off — closing status by country" rows={signOffByEntity} />
 
       <EntityProgressTable period={period} byEntity={summary.byEntity} />
 
