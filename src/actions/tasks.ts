@@ -103,6 +103,63 @@ export async function addTask(input: AddTaskInput): Promise<AddTaskResult> {
   }
 }
 
+type UpdateTaskInput = {
+  taskId: string;
+  name: string;
+  closingType: "MONTHLY" | "QUARTERLY";
+  sectionId: string;
+};
+
+type UpdateTaskResult = { ok: true } | { ok: false; error: string };
+
+/** Renames a task, and/or moves it to a different section or frequency. */
+export async function updateTask(input: UpdateTaskInput): Promise<UpdateTaskResult> {
+  const name = input.name.trim();
+  if (!name) {
+    return { ok: false, error: "Task name can't be empty." };
+  }
+
+  try {
+    await prisma.task.update({
+      where: { id: input.taskId },
+      data: { name, closingType: input.closingType, sectionId: input.sectionId },
+    });
+
+    revalidatePath("/corporate");
+    return { ok: true };
+  } catch (err: unknown) {
+    if (typeof err === "object" && err !== null && "code" in err && err.code === "P2002") {
+      return { ok: false, error: "A task with that name already exists in that section." };
+    }
+    console.error("updateTask failed", err);
+    return { ok: false, error: "Couldn't update the task." };
+  }
+}
+
+type DeleteTaskResult = { ok: true } | { ok: false; error: string };
+
+/**
+ * Deletes a task. Blocked if it already has any recorded completion history
+ * (the database's foreign key won't allow it) — that history is meant to be
+ * permanent, so renaming is offered instead of a destructive delete.
+ */
+export async function deleteTask(taskId: string): Promise<DeleteTaskResult> {
+  try {
+    await prisma.task.delete({ where: { id: taskId } });
+    revalidatePath("/corporate");
+    return { ok: true };
+  } catch (err: unknown) {
+    if (typeof err === "object" && err !== null && "code" in err && err.code === "P2003") {
+      return {
+        ok: false,
+        error: "Can't delete this task — it already has recorded history. Rename it instead.",
+      };
+    }
+    console.error("deleteTask failed", err);
+    return { ok: false, error: "Couldn't delete the task." };
+  }
+}
+
 type HistoryInput = { entityId: string; taskId: string; period: string };
 type HistoryResult = { ok: true; events: TaskHistoryEvent[] } | { ok: false; error: string };
 

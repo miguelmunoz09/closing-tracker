@@ -11,13 +11,13 @@ export function EntityProgressTable({
   byEntity: CorporateEntityRow[];
 }) {
   return (
-    <div className="mt-6 rounded-lg border border-gray-200 bg-white shadow-sm">
-      <h2 className="border-b border-gray-100 px-4 py-3 text-sm font-semibold text-gray-900">
+    <details open className="mt-6 rounded-lg border border-gray-200 bg-white shadow-sm">
+      <summary className="cursor-pointer select-none px-4 py-3 text-sm font-semibold text-gray-900">
         Progress by entity
-      </h2>
+      </summary>
       <table className="w-full text-sm">
         <thead>
-          <tr className="text-left text-xs text-gray-500">
+          <tr className="border-t border-gray-100 text-left text-xs text-gray-500">
             <th className="px-4 py-2">Entity</th>
             <th className="px-4 py-2 text-right">Progress</th>
           </tr>
@@ -41,6 +41,6 @@ export function EntityProgressTable({
           ))}
         </tbody>
       </table>
-    </div>
+    </details>
   );
 }

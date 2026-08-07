@@ -283,3 +283,27 @@ export async function getSections(): Promise<SectionOption[]> {
     select: { id: true, name: true },
   });
 }
+
+export type EditableTask = {
+  id: string;
+  name: string;
+  closingType: TaskClosingType;
+  sectionId: string;
+  sectionName: string;
+};
+
+/** Every task, across every section, for the "edit existing tasks" panel. */
+export async function getAllTasksForEditing(): Promise<EditableTask[]> {
+  const tasks = await prisma.task.findMany({
+    include: { section: true },
+    orderBy: [{ section: { sortOrder: "asc" } }, { sortOrder: "asc" }],
+  });
+
+  return tasks.map((t) => ({
+    id: t.id,
+    name: t.name,
+    closingType: t.closingType,
+    sectionId: t.sectionId,
+    sectionName: t.section.name,
+  }));
+}

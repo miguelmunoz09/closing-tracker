@@ -1,5 +1,10 @@
 import Link from "next/link";
-import { getCorporateSummary, getSectionProgressByEntity, getSections } from "@/lib/data";
+import {
+  getCorporateSummary,
+  getSectionProgressByEntity,
+  getSections,
+  getAllTasksForEditing,
+} from "@/lib/data";
 import { getAvailablePeriods, getDefaultPeriod } from "@/lib/period";
 import { PeriodSelector } from "@/components/PeriodSelector";
 import { ProgressRing } from "@/components/ProgressRing";
@@ -7,6 +12,7 @@ import { SectionProgressGrid } from "@/components/SectionProgressGrid";
 import { EntityProgressTable } from "@/components/EntityProgressTable";
 import { SectionEntityDetail } from "@/components/SectionEntityDetail";
 import { AddTaskForm } from "@/components/AddTaskForm";
+import { EditTasksPanel } from "@/components/EditTasksPanel";
 
 export default async function CorporatePage({
   searchParams,
@@ -14,11 +20,12 @@ export default async function CorporatePage({
   searchParams: { period?: string };
 }) {
   const period = searchParams.period ?? getDefaultPeriod();
-  const [summary, sections, revenueByEntity, signOffByEntity] = await Promise.all([
+  const [summary, sections, revenueByEntity, signOffByEntity, allTasks] = await Promise.all([
     getCorporateSummary(period),
     getSections(),
     getSectionProgressByEntity(period, "Revenue"),
     getSectionProgressByEntity(period, "Sign Off"),
+    getAllTasksForEditing(),
   ]);
 
   return (
@@ -61,6 +68,8 @@ export default async function CorporatePage({
         </p>
         <AddTaskForm sections={sections} />
       </div>
+
+      <EditTasksPanel tasks={allTasks} sections={sections} />
     </main>
   );
 }

@@ -13,9 +13,11 @@ export function SectionEntityDetail({
   const pending = rows.filter((r) => !r.closed);
 
   return (
-    <div className="mt-6 rounded-lg border border-gray-200 bg-white p-5 shadow-sm">
-      <h2 className="mb-4 text-sm font-semibold text-gray-900">{title}</h2>
-      <div className="grid gap-6 sm:grid-cols-2">
+    <details open className="mt-6 rounded-lg border border-gray-200 bg-white p-5 shadow-sm">
+      <summary className="cursor-pointer select-none text-sm font-semibold text-gray-900">
+        {title}
+      </summary>
+      <div className="mt-4 grid gap-6 sm:grid-cols-2">
         <div>
           <p className="mb-2 text-xs font-medium uppercase tracking-wide text-green-700">
             Closed ({closed.length})
@@ -51,6 +53,6 @@ export function SectionEntityDetail({
           </ul>
         </div>
       </div>
-    </div>
+    </details>
   );
 }
