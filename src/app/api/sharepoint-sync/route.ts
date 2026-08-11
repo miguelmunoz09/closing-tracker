@@ -1,9 +1,12 @@
 // Webhook called by a Power Automate flow whenever a file is created or
-// changed in the SharePoint reports library. Expects one file per entity
-// per month, named "CODE_YYYY-MM.ext" (e.g. "2560_2026-08.xlsx"). When such
-// a file shows up, this marks every visible "Reporting" section task as
-// done for that entity + period — the same way the manual checkbox does
-// (a new TaskCompletion row per task, so the history stays complete).
+// changed in the SharePoint reports library. Each country uploads one file
+// PER REPORT TYPE per month, named "CODE_report-type_YYYY-MM.ext"
+// (e.g. "2560_sales-units_2026-08.xlsx"). The "report-type" segment is
+// matched against the slugified name of a "Reporting" section task
+// ("Sales units" -> "sales-units", "AR" -> "ar", "Units" -> "units",
+// "Tax template" -> "tax-template"). When such a file shows up, this marks
+// that ONE task as done for that entity + period — same mechanism as the
+// manual checkbox (a new TaskCompletion row, so the history stays complete).
 //
 // Protected by a token: Power Automate must send the same value as the
 // SHAREPOINT_WEBHOOK_SECRET environment variable, either as
@@ -12,21 +15,24 @@ import { NextRequest, NextResponse } from "next/server";
 import { TaskClosingType } from "@prisma/client";
 import { prisma } from "@/lib/prisma";
 import { getVisibleTaskClosingTypes } from "@/lib/period";
+import { slugify } from "@/lib/slug";
 
 export const dynamic = "force-dynamic";
 
 const REPORTING_SECTION_NAME = "Reporting";
 
-function parseFileName(fileName: string): { code: string; period: string } | null {
+function parseFileName(fileName: string): { code: string; taskSlug: string; period: string } | null {
   const base = fileName.replace(/\.[^./\\]+$/, ""); // strip extension
-  const separatorIndex = base.lastIndexOf("_");
-  if (separatorIndex === -1) return null;
+  const firstUnderscore = base.indexOf("_");
+  const lastUnderscore = base.lastIndexOf("_");
+  if (firstUnderscore === -1 || firstUnderscore === lastUnderscore) return null; // needs 2 underscores
 
-  const code = base.slice(0, separatorIndex).trim();
-  const period = base.slice(separatorIndex + 1).trim();
-  if (!code || !/^\d{4}-\d{2}$/.test(period)) return null;
+  const code = base.slice(0, firstUnderscore).trim();
+  const taskSlug = base.slice(firstUnderscore + 1, lastUnderscore).trim().toLowerCase();
+  const period = base.slice(lastUnderscore + 1).trim();
+  if (!code || !taskSlug || !/^\d{4}-\d{2}$/.test(period)) return null;
 
-  return { code, period };
+  return { code, taskSlug, period };
 }
 
 export async function POST(request: NextRequest) {
@@ -52,7 +58,7 @@ export async function POST(request: NextRequest) {
     return NextResponse.json(
       {
         ok: false,
-        error: `Couldn't read an entity code and period from "${fileName}". Expected format: CODE_YYYY-MM.ext (e.g. 2560_2026-08.xlsx).`,
+        error: `Couldn't read an entity code, report type, and period from "${fileName}". Expected format: CODE_report-type_YYYY-MM.ext (e.g. 2560_sales-units_2026-08.xlsx).`,
       },
       { status: 400 }
     );
@@ -71,26 +77,24 @@ export async function POST(request: NextRequest) {
     where: { closingType: { in: visibleTypes }, section: { name: REPORTING_SECTION_NAME } },
   });
 
-  if (reportingTasks.length === 0) {
-    return NextResponse.json({
-      ok: true,
-      message: "No Reporting tasks apply to this period.",
-      marked: 0,
-    });
+  const task = reportingTasks.find((t) => slugify(t.name) === parsed.taskSlug);
+  if (!task) {
+    const validSlugs = reportingTasks.map((t) => slugify(t.name)).join(", ") || "(none apply this period)";
+    return NextResponse.json(
+      {
+        ok: false,
+        error: `"${parsed.taskSlug}" doesn't match any Reporting task for ${parsed.period}. Expected one of: ${validSlugs}.`,
+      },
+      { status: 404 }
+    );
   }
 
-  await prisma.taskCompletion.createMany({
-    data: reportingTasks.map((t) => ({
-      entityId: entity.id,
-      taskId: t.id,
-      period: parsed.period,
-      completed: true,
-    })),
+  await prisma.taskCompletion.create({
+    data: { entityId: entity.id, taskId: task.id, period: parsed.period, completed: true },
   });
 
   return NextResponse.json({
     ok: true,
-    message: `Marked ${reportingTasks.length} Reporting task(s) as done for ${entity.displayName}, ${parsed.period}.`,
-    marked: reportingTasks.length,
+    message: `Marked "${task.name}" as done for ${entity.displayName}, ${parsed.period}.`,
   });
 }
