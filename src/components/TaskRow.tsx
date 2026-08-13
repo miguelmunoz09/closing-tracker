@@ -20,14 +20,22 @@ export function TaskRow({
         </span>
       </div>
       <div className="flex items-center gap-3">
+        {/*
+          The key has to sit on the client component itself, not on an
+          ancestor server component (TaskRow) — a key on a server-component
+          invocation doesn't reliably force the nested client component to
+          remount. Keying by period here guarantees a fresh instance (and
+          therefore fresh useState) every time the selected month changes.
+        */}
         <TaskCheckbox
+          key={period}
           entityId={entityId}
           taskId={task.id}
           period={period}
           initialCompleted={task.completed}
           initialCompletedAt={task.completedAt}
         />
-        <TaskHistoryToggle entityId={entityId} taskId={task.id} period={period} />
+        <TaskHistoryToggle key={period} entityId={entityId} taskId={task.id} period={period} />
       </div>
     </div>
   );
