@@ -27,3 +27,7 @@ next-env.d.ts
 .vercel
 .env*
 .seed_secret.local
+.sharepoint_secret.local
+
+# guías con datos internos/secretos, no es parte del código de la app
+Guia-*.txt
