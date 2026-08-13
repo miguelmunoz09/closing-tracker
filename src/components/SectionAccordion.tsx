@@ -23,12 +23,7 @@ export function SectionAccordion({
       </summary>
       <div>
         {section.tasks.map((task) => (
-          // La key incluye el período a propósito: si no, al cambiar de mes
-          // React reutiliza el mismo componente en pantalla (mismo task.id)
-          // y el tilde se queda con el estado del mes anterior en vez de
-          // tomar el nuevo. Con el período en la key, React lo vuelve a
-          // crear desde cero cada vez, con el estado correcto de ese mes.
-          <TaskRow key={`${task.id}-${period}`} entityId={entityId} period={period} task={task} />
+          <TaskRow key={task.id} entityId={entityId} period={period} task={task} />
         ))}
       </div>
     </details>
