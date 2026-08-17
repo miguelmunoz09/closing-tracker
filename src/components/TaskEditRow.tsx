@@ -38,20 +38,20 @@ export function TaskEditRow({ task, sections }: { task: EditableTask; sections: 
   }
 
   if (deleted) {
-    return <p className="border-b border-gray-100 py-3 text-sm text-gray-400 last:border-b-0">Task deleted.</p>;
+    return <p className="py-3 text-sm text-gray-400">Task deleted.</p>;
   }
 
   return (
-    <div className="flex flex-col gap-2 border-b border-gray-100 py-3 last:border-b-0 sm:flex-row sm:items-center sm:gap-3">
+    <div className="flex flex-col gap-2 py-3 sm:flex-row sm:items-center sm:gap-3">
       <input
         value={name}
         onChange={(e) => setName(e.target.value)}
-        className="flex-1 rounded-md border border-gray-300 px-2 py-1.5 text-sm"
+        className="flex-1 rounded-lg border border-gray-300 px-2.5 py-1.5 text-sm focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-100"
       />
       <select
         value={sectionId}
         onChange={(e) => setSectionId(e.target.value)}
-        className="rounded-md border border-gray-300 px-2 py-1.5 text-sm"
+        className="rounded-lg border border-gray-300 px-2.5 py-1.5 text-sm focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-100"
       >
         {sections.map((s) => (
           <option key={s.id} value={s.id}>
@@ -62,7 +62,7 @@ export function TaskEditRow({ task, sections }: { task: EditableTask; sections: 
       <select
         value={closingType}
         onChange={(e) => setClosingType(e.target.value as "MONTHLY" | "QUARTERLY")}
-        className="rounded-md border border-gray-300 px-2 py-1.5 text-sm"
+        className="rounded-lg border border-gray-300 px-2.5 py-1.5 text-sm focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-100"
       >
         <option value="MONTHLY">Monthly</option>
         <option value="QUARTERLY">Quarterly</option>
@@ -73,7 +73,7 @@ export function TaskEditRow({ task, sections }: { task: EditableTask; sections: 
           type="button"
           onClick={handleSave}
           disabled={pending}
-          className="rounded-md bg-gray-900 px-3 py-1.5 text-xs font-medium text-white hover:bg-gray-700 disabled:opacity-50"
+          className="rounded-lg bg-gray-900 px-3 py-1.5 text-xs font-medium text-white hover:bg-gray-700 disabled:opacity-50"
         >
           {pending ? "Saving..." : "Save"}
         </button>
@@ -82,7 +82,7 @@ export function TaskEditRow({ task, sections }: { task: EditableTask; sections: 
           <button
             type="button"
             onClick={() => setConfirmingDelete(true)}
-            className="rounded-md px-3 py-1.5 text-xs font-medium text-red-600 hover:bg-red-50"
+            className="rounded-lg px-3 py-1.5 text-xs font-medium text-red-600 hover:bg-red-50"
           >
             Delete
           </button>
@@ -92,14 +92,14 @@ export function TaskEditRow({ task, sections }: { task: EditableTask; sections: 
               type="button"
               onClick={handleDelete}
               disabled={pending}
-              className="rounded-md bg-red-600 px-3 py-1.5 text-xs font-medium text-white hover:bg-red-700 disabled:opacity-50"
+              className="rounded-lg bg-red-600 px-3 py-1.5 text-xs font-medium text-white hover:bg-red-700 disabled:opacity-50"
             >
               Confirm delete
             </button>
             <button
               type="button"
               onClick={() => setConfirmingDelete(false)}
-              className="rounded-md px-3 py-1.5 text-xs font-medium text-gray-600 hover:bg-gray-100"
+              className="rounded-lg px-3 py-1.5 text-xs font-medium text-gray-600 hover:bg-gray-100"
             >
               Cancel
             </button>
@@ -107,7 +107,7 @@ export function TaskEditRow({ task, sections }: { task: EditableTask; sections: 
         )}
       </div>
 
-      {success && <span className="text-xs text-green-700">Saved.</span>}
+      {success && <span className="text-xs font-medium text-green-700">Saved.</span>}
       {error && <span className="text-xs text-red-600">{error}</span>}
     </div>
   );

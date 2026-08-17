@@ -51,10 +51,11 @@ export function TaskCheckbox({
         checked={completed}
         disabled={pending}
         onChange={(e) => onChange(e.target.checked)}
-        className="h-4 w-4 cursor-pointer rounded border-gray-300 text-gray-900 focus:ring-gray-500"
+        className="task-checkbox"
+        aria-label="Mark task done"
       />
       {completed && completedAt && (
-        <span className="whitespace-nowrap text-xs text-green-700">
+        <span className="whitespace-nowrap text-xs font-medium text-green-700">
           ✓ Done on {formatDate(completedAt)}
         </span>
       )}

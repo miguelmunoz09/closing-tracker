@@ -45,12 +45,12 @@ export function TaskHistoryToggle({
       <button
         type="button"
         onClick={handleToggle}
-        className="text-xs text-gray-500 underline hover:text-gray-800"
+        className="whitespace-nowrap text-xs font-medium text-gray-400 underline decoration-gray-300 hover:text-blue-600 hover:decoration-blue-400"
       >
         {open ? "Hide history" : "View history"}
       </button>
       {open && (
-        <div className="mt-1 rounded-md bg-gray-50 px-2 py-1.5 text-xs text-gray-600">
+        <div className="mt-1 rounded-lg bg-gray-50 px-2.5 py-1.5 text-xs text-gray-600">
           {loading && <p>Loading...</p>}
           {error && <p className="text-red-600">{error}</p>}
           {events && events.length === 0 && <p>No changes yet this period.</p>}

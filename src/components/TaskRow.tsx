@@ -12,10 +12,20 @@ export function TaskRow({
   task: EntityClosingTask;
 }) {
   return (
-    <div className="flex flex-col gap-1 border-b border-gray-100 px-4 py-3 last:border-b-0 sm:flex-row sm:items-center sm:justify-between">
+    <div
+      className={`flex flex-col gap-2 px-4 py-3.5 transition-colors sm:flex-row sm:items-center sm:justify-between ${
+        task.completed ? "bg-green-50/50" : ""
+      }`}
+    >
       <div className="flex items-center gap-2">
         <span className="text-sm text-gray-900">{task.name}</span>
-        <span className="rounded-full bg-gray-100 px-2 py-0.5 text-[11px] font-medium text-gray-500">
+        <span
+          className={`rounded-full px-2 py-0.5 text-[11px] font-medium ${
+            task.closingType === "MONTHLY"
+              ? "bg-gray-100 text-gray-500"
+              : "bg-blue-50 text-blue-600"
+          }`}
+        >
           {task.closingType === "MONTHLY" ? "Monthly" : "Quarterly"}
         </span>
       </div>

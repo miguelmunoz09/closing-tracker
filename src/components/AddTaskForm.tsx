@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { addTask } from "@/actions/tasks";
 import type { SectionOption } from "@/lib/data";
+import { PlusIcon } from "@/components/icons";
 
 /**
  * Formulario para agregar una tarea nueva. Solo lo usa Corporate team: la
@@ -40,23 +41,22 @@ export function AddTaskForm({ sections }: { sections: SectionOption[] }) {
       <button
         type="button"
         onClick={() => setOpen(true)}
-        className="mt-4 text-sm font-medium text-gray-700 underline hover:text-gray-900"
+        className="inline-flex items-center gap-1.5 rounded-lg border border-gray-200 px-3 py-1.5 text-sm font-medium text-gray-700 hover:border-blue-200 hover:bg-blue-50 hover:text-blue-700"
       >
-        + Add new task
+        <PlusIcon className="h-4 w-4" />
+        New task
       </button>
     );
   }
 
   return (
-    <form onSubmit={handleSubmit} className="mt-4 space-y-3 rounded-md border border-gray-200 bg-white p-4">
-      <h3 className="text-sm font-semibold">Add new task</h3>
-
+    <form onSubmit={handleSubmit} className="space-y-3 rounded-xl border border-gray-200 bg-gray-50/60 p-4">
       <label className="block text-sm">
-        Section
+        <span className="mb-1 block font-medium text-gray-700">Section</span>
         <select
           value={sectionId}
           onChange={(e) => setSectionId(e.target.value)}
-          className="mt-1 block w-full rounded-md border border-gray-300 px-2 py-1.5 text-sm"
+          className="block w-full rounded-lg border border-gray-300 bg-white px-2.5 py-1.5 text-sm focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-100"
         >
           {sections.map((s) => (
             <option key={s.id} value={s.id}>
@@ -67,55 +67,56 @@ export function AddTaskForm({ sections }: { sections: SectionOption[] }) {
       </label>
 
       <label className="block text-sm">
-        Task name
+        <span className="mb-1 block font-medium text-gray-700">Task name</span>
         <input
           type="text"
           value={name}
           onChange={(e) => setName(e.target.value)}
           required
-          className="mt-1 block w-full rounded-md border border-gray-300 px-2 py-1.5 text-sm"
+          className="block w-full rounded-lg border border-gray-300 bg-white px-2.5 py-1.5 text-sm focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-100"
         />
       </label>
 
       <fieldset className="text-sm">
-        <legend className="mb-1">Frequency</legend>
-        <div className="flex gap-4">
-          <label className="flex items-center gap-1.5">
-            <input
-              type="radio"
-              name="closingType"
-              checked={closingType === "MONTHLY"}
-              onChange={() => setClosingType("MONTHLY")}
-            />
-            Monthly
-          </label>
-          <label className="flex items-center gap-1.5">
-            <input
-              type="radio"
-              name="closingType"
-              checked={closingType === "QUARTERLY"}
-              onChange={() => setClosingType("QUARTERLY")}
-            />
-            Quarterly
-          </label>
+        <legend className="mb-1 font-medium text-gray-700">Frequency</legend>
+        <div className="flex gap-2">
+          {(["MONTHLY", "QUARTERLY"] as const).map((type) => (
+            <label
+              key={type}
+              className={`cursor-pointer rounded-lg border px-3 py-1.5 text-sm font-medium transition ${
+                closingType === type
+                  ? "border-blue-600 bg-blue-50 text-blue-700"
+                  : "border-gray-200 bg-white text-gray-600 hover:bg-gray-50"
+              }`}
+            >
+              <input
+                type="radio"
+                name="closingType"
+                className="sr-only"
+                checked={closingType === type}
+                onChange={() => setClosingType(type)}
+              />
+              {type === "MONTHLY" ? "Monthly" : "Quarterly"}
+            </label>
+          ))}
         </div>
       </fieldset>
 
       {error && <p className="text-sm text-red-600">{error}</p>}
-      {success && <p className="text-sm text-green-700">Task added.</p>}
+      {success && <p className="text-sm font-medium text-green-700">Task added.</p>}
 
-      <div className="flex gap-2">
+      <div className="flex gap-2 pt-1">
         <button
           type="submit"
           disabled={pending}
-          className="rounded-md bg-gray-900 px-3 py-1.5 text-sm font-medium text-white hover:bg-gray-700 disabled:opacity-50"
+          className="rounded-lg bg-blue-600 px-3 py-1.5 text-sm font-medium text-white hover:bg-blue-700 disabled:opacity-50"
         >
           {pending ? "Saving..." : "Save"}
         </button>
         <button
           type="button"
           onClick={() => setOpen(false)}
-          className="rounded-md px-3 py-1.5 text-sm font-medium text-gray-600 hover:bg-gray-100"
+          className="rounded-lg px-3 py-1.5 text-sm font-medium text-gray-600 hover:bg-gray-100"
         >
           Cancel
         </button>

@@ -31,27 +31,24 @@ export function EntityPicker({ entities, period }: { entities: PickerEntity[]; p
 
   return (
     <div className="w-full">
-      <label htmlFor="entity-search" className="mb-1 block text-sm font-medium text-gray-700">
-        Reporting entity
-      </label>
       <input
-        id="entity-search"
+        aria-label="Search reporting entity"
         type="text"
         placeholder="Search by country or code (e.g. Uruguay, 2560)..."
         value={query}
         onChange={(e) => setQuery(e.target.value)}
-        className="mb-2 w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:border-gray-500 focus:outline-none"
+        className="mb-2 w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-100"
       />
-      <ul className="max-h-72 overflow-y-auto rounded-md border border-gray-200 bg-white">
+      <ul className="max-h-64 overflow-y-auto rounded-lg border border-gray-200">
         {filtered.length === 0 && (
           <li className="px-3 py-2 text-sm text-gray-500">No entities found.</li>
         )}
         {filtered.map((e) => (
-          <li key={e.id}>
+          <li key={e.id} className="border-b border-gray-100 last:border-b-0">
             <button
               type="button"
               onClick={() => goTo(e.id)}
-              className="flex w-full items-center gap-2 px-3 py-2 text-left text-sm hover:bg-gray-100 focus:bg-gray-100 focus:outline-none"
+              className="flex w-full items-center gap-2.5 px-3 py-2 text-left text-sm text-gray-800 hover:bg-blue-50 focus:bg-blue-50 focus:outline-none"
             >
               {e.flag}
               {e.displayName}

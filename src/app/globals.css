@@ -6,3 +6,64 @@ html,
 body {
   height: 100%;
 }
+
+body {
+  font-feature-settings: "cv02", "cv03", "cv04", "cv11";
+  -webkit-font-smoothing: antialiased;
+}
+
+/* We draw our own chevron in SectionAccordion, so hide the native
+   <summary> disclosure triangle in every browser. */
+summary {
+  list-style: none;
+}
+summary::-webkit-details-marker {
+  display: none;
+}
+
+/* Custom checkbox: same native <input type="checkbox">, restyled so it
+   matches the rest of the UI instead of the browser's default box. */
+.task-checkbox {
+  appearance: none;
+  width: 1.25rem;
+  height: 1.25rem;
+  border-radius: 0.375rem;
+  border: 1.5px solid #d1d5db;
+  background-color: #fff;
+  cursor: pointer;
+  display: inline-block;
+  position: relative;
+  flex-shrink: 0;
+  transition: background-color 0.15s ease, border-color 0.15s ease;
+}
+
+.task-checkbox:hover {
+  border-color: #9ca3af;
+}
+
+.task-checkbox:checked {
+  background-color: #2563eb;
+  border-color: #2563eb;
+}
+
+.task-checkbox:checked::after {
+  content: "";
+  position: absolute;
+  left: 6px;
+  top: 2px;
+  width: 5px;
+  height: 9px;
+  border: solid white;
+  border-width: 0 2px 2px 0;
+  transform: rotate(45deg);
+}
+
+.task-checkbox:focus-visible {
+  outline: 2px solid #2563eb;
+  outline-offset: 2px;
+}
+
+.task-checkbox:disabled {
+  opacity: 0.6;
+  cursor: default;
+}
